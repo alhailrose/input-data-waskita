@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Input Data Pengujian</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome for icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <style>
+      body {
+        background-color: #f8f9fa;
+      }
+
+      .form-section {
+        margin-bottom: 25px;
+      }
+
+      .ujiBendaRow {
+        border: 1px solid #dee2e6;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: 5px;
+        background-color: #ffffff;
+      }
+
+      .hapusBarisBtn {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 3px;
+        font-size: 14px;
+        cursor: pointer;
+      }
+
+      .hapusBarisBtn:hover {
+        background: #c82333;
+      }
+
+      .btn-toggle {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 3px;
+        font-size: 14px;
+        cursor: pointer;
+      }
+
+      .btn-toggle:hover {
+        background: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container mt-5">
+      <h2 class="text-center mb-4">Form Input Data Pengujian</h2>
+
+      <form action="/input" method="post">
+        <!-- Input untuk header -->
+        <div class="form-section">
+          <div class="form-group">
+            <label for="proyek">Proyek:</label>
+            <input
+              type="text"
+              class="form-control"
+              id="proyek"
+              name="proyek"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="customer">Customer:</label>
+            <input
+              type="text"
+              class="form-control"
+              id="customer"
+              name="customer"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="tempat_test">Tempat Test:</label>
+            <input
+              type="text"
+              class="form-control"
+              id="tempat_test"
+              name="tempat_test"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="tanggal_test">Tanggal Test:</label>
+            <input
+              type="date"
+              class="form-control"
+              id="tanggal_test"
+              name="tanggal_test"
+              required
+            />
+          </div>
+        </div>
+
+        <!-- Section for adding uji benda -->
+        <div id="ujiBendaContainer">
+          <div class="ujiBendaRow">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5>Uji Benda 1</h5>
+              <button
+                type="button"
+                class="btn-toggle"
+                data-toggle="collapse"
+                data-target="#ujiBenda1"
+                aria-expanded="false"
+                aria-controls="ujiBenda1"
+              >
+                <i class="fas fa-plus"></i>
+              </button>
+            </div>
+            <div id="ujiBenda1" class="collapse">
+              <div class="form-group">
+                <label for="kode_benda_uji">Kode Benda Uji:</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="kode_benda_uji"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="mutu">Mutu:</label>
+                <input type="text" class="form-control" name="mutu" required />
+              </div>
+
+              <div class="form-group">
+                <label for="umur_test">Umur Test:</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="umur_test"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="tanggal_cor">Tanggal Cor:</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  name="tanggal_cor"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="jenis_benda_uji">Jenis Benda Uji:</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="jenis_benda_uji"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="ukuran_benda_uji">Ukuran Benda Uji:</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="ukuran_benda_uji"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="volume">Volume (m³):</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  name="volume"
+                  step="0.0001"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="berat">Berat (kg):</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  name="berat"
+                  step="0.0001"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="beban">Beban (KN):</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  name="beban"
+                  step="0.0001"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="tipe_retakan">Tipe Retakan:</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="tipe_retakan"
+                  required
+                />
+              </div>
+
+              <button type="button" class="hapusBarisBtn">Hapus Uji</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tombol Tambah -->
+        <button type="button" id="tambahBarisBtn" class="btn btn-primary mb-3">
+          Tambah Uji
+        </button>
+
+        <!-- Tombol Submit -->
+        <div class="form-group">
+          <label>
+            <input type="radio" name="action" value="new_file" required /> Buat
+            file baru
+          </label>
+          <label>
+            <input type="radio" name="action" value="new_sheet" required />
+            Tambahkan sheet baru
+          </label>
+        </div>
+        <button type="submit" class="btn btn-success">Submit</button>
+      </form>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+      let ujiBendaCount = 1;
+
+      document
+        .getElementById("tambahBarisBtn")
+        .addEventListener("click", function () {
+          ujiBendaCount++;
+          const newRow = document.createElement("div");
+          newRow.classList.add("ujiBendaRow");
+          newRow.innerHTML = `
+          <div class="d-flex justify-content-between align-items-center">
+            <h5>Uji Benda ${ujiBendaCount}</h5>
+            <button type="button" class="btn-toggle" data-toggle="collapse" data-target="#ujiBenda${ujiBendaCount}" aria-expanded="false" aria-controls="ujiBenda${ujiBendaCount}">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+          <div id="ujiBenda${ujiBendaCount}" class="collapse">
+            <div class="form-group">
+              <label for="kode_benda_uji">Kode Benda Uji:</label>
+              <input type="text" class="form-control" name="kode_benda_uji" required />
+            </div>
+            <div class="form-group">
+              <label for="mutu">Mutu:</label>
+              <input type="text" class="form-control" name="mutu" required />
+            </div>
+            <div class="form-group">
+              <label for="umur_test">Umur Test:</label>
+              <input type="text" class="form-control" name="umur_test" required />
+            </div>
+            <div class="form-group">
+              <label for="tanggal_cor">Tanggal Cor:</label>
+              <input type="date" class="form-control" name="tanggal_cor" required />
+            </div>
+            <div class="form-group">
+              <label for="jenis_benda_uji">Jenis Benda Uji:</label>
+              <input type="text" class="form-control" name="jenis_benda_uji" required />
+            </div>
+            <div class="form-group">
+              <label for="ukuran_benda_uji">Ukuran Benda Uji:</label>
+              <input type="text" class="form-control" name="ukuran_benda_uji" required />
+            </div>
+            <div class="form-group">
+              <label for="volume">Volume (m³):</label>
+              <input type="number" class="form-control" name="volume" step="0.0001" required />
+            </div>
+            <div class="form-group">
+              <label for="berat">Berat (kg):</label>
+              <input type="number" class="form-control" name="berat" step="0.0001" required />
+            </div>
+            <div class="form-group">
+              <label for="beban">Beban (KN):</label>
+              <input type="number" class="form-control" name="beban" step="0.0001" required />
+            </div>
+            <div class="form-group">
+              <label for="tipe_retakan">Tipe Retakan:</label>
+              <input type="text" class="form-control" name="tipe_retakan" required />
+            </div>
+            <button type="button" class="hapusBarisBtn">Hapus Uji</button>
+          </div>
+        `;
+          document.getElementById("ujiBendaContainer").appendChild(newRow);
+        });
+
+      // Fungsi untuk hapus baris
+      document.addEventListener("click", function (e) {
+        if (e.target && e.target.classList.contains("hapusBarisBtn")) {
+          e.target.closest(".ujiBendaRow").remove();
+        }
+      });
+    </script>
+  </body>
+</html>
