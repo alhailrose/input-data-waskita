@@ -45,12 +45,7 @@ def copy_template_to_sheet(template_ws, target_ws):
                 )
 
             # Salin Fill
-            if cell.fill:
-                new_cell.fill = PatternFill(
-                    fill_type=cell.fill.fill_type,
-                    start_color=cell.fill.start_color.index,
-                    end_color=cell.fill.end_color.index
-                )
+            # Salin Fil
 
             # Salin Border
             if cell.border:
