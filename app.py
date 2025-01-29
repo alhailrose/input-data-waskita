@@ -6,7 +6,6 @@ import os
 from datetime import datetime
 from openpyxl.styles import Font, Alignment, PatternFill, Border
 from openpyxl.drawing.image import Image
-from io import BytesIO
 
 app = Flask(__name__)
 
@@ -18,21 +17,49 @@ if not os.path.exists(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR)
 
 def copy_template_to_sheet(template_ws, target_ws):
-    """Salin semua konten, gaya, merge cells, pengaturan halaman, dan gambar dari template_ws ke target_ws."""
-    
-    # Salin isi sel dan format
+    """Salin semua konten, gaya, pengaturan halaman, dimensi, merge cells, dan gambar dari template_ws ke target_ws."""
     for row in template_ws.iter_rows():
         for cell in row:
             new_cell = target_ws.cell(row=cell.row, column=cell.column, value=cell.value)
-
+            
+            # Salin Font
             if cell.font:
-                new_cell.font = cell.font
+                new_cell.font = Font(
+                    name=cell.font.name,
+                    size=cell.font.size,
+                    bold=cell.font.bold,
+                    italic=cell.font.italic,
+                    underline=cell.font.underline,
+                    strike=cell.font.strike,
+                    color=cell.font.color
+                )
+
+            # Salin Alignment
             if cell.alignment:
-                new_cell.alignment = cell.alignment
-            if cell.fill:
-                new_cell.fill = cell.fill
+                new_cell.alignment = Alignment(
+                    horizontal=cell.alignment.horizontal,
+                    vertical=cell.alignment.vertical,
+                    wrap_text=cell.alignment.wrap_text,
+                    shrink_to_fit=cell.alignment.shrink_to_fit,
+                    text_rotation=cell.alignment.text_rotation
+                )
+
+            # Salin Fill
+            # Salin Fill
+
+
+            # Salin Border
             if cell.border:
-                new_cell.border = cell.border
+                sides = ['left', 'right', 'top', 'bottom', 'diagonal']
+                border_sides = {side: getattr(cell.border, side) for side in sides}
+                new_cell.border = Border(
+                    left=border_sides['left'],
+                    right=border_sides['right'],
+                    top=border_sides['top'],
+                    bottom=border_sides['bottom'],
+                    diagonal=border_sides['diagonal'],
+                    diagonal_direction=cell.border.diagonal_direction
+                )
 
     # Salin merge cells
     for merged_range in template_ws.merged_cells.ranges:
@@ -44,19 +71,26 @@ def copy_template_to_sheet(template_ws, target_ws):
     target_ws.sheet_properties = template_ws.sheet_properties
     target_ws.page_margins = template_ws.page_margins
 
-    # Salin dimensi kolom dan baris
+    # Atur Header dan Footer secara manual (jika diperlukan)
+    if hasattr(template_ws, 'header_footer'):
+        target_ws.header_footer = template_ws.header_footer
+
+    # Salin dimensi kolom dari template ke target
     for col_letter, col_dimension in template_ws.column_dimensions.items():
-        target_ws.column_dimensions[col_letter].width = col_dimension.width
+        if col_dimension.width:
+            target_ws.column_dimensions[col_letter].width = col_dimension.width
 
+    # Salin dimensi baris
     for row_number, row_dimension in template_ws.row_dimensions.items():
-        target_ws.row_dimensions[row_number].height = row_dimension.height
+        if row_dimension.height:
+            target_ws.row_dimensions[row_number].height = row_dimension.height
 
-    # **🔹 Perbaikan utama: Salin gambar dengan BytesIO**
-    for img in template_ws._images:
-        img_stream = BytesIO(img._data())  # Ambil gambar dalam format bytes
-        new_img = Image(img_stream)  # Buat ulang gambar dari bytes
-        new_img.anchor = img.anchor  # Tetapkan posisi gambar yang sama
-        target_ws.add_image(new_img)  # Tambahkan gambar ke t
+    # Salin gambar
+    for image in template_ws._images:
+        img = Image(image.ref)
+        img.anchor = image.anchor
+        target_ws.add_image(img)
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -100,42 +134,13 @@ def input_data():
                 if tanggal_test_formatted in wb.sheetnames:
                     return jsonify({"error": f"Sheet {tanggal_test_formatted} sudah ada."}), 400
                 ws = wb.create_sheet(title=tanggal_test_formatted)
-                template_wb = openpyxl.load_workbook(TEMPLATE_PATH)
-                template_ws = template_wb.active
-                copy_template_to_sheet(template_ws, ws)
             else:
                 return jsonify({"error": "File tidak ditemukan. Pilih 'Buat file baru'."}), 400
        
-        ws['C12'] = f": {proyek}"
-        ws['C14'] = f": {customer}"
-        ws['C15'] = f": {tempat_test}"
-        ws['C17'] = f": {tanggal_test}"
-
-        start_row = 23
-        for i in range(row_count):
-            ws.cell(row=start_row + i, column=2, value=kode_benda_uji[i])
-            ws.cell(row=start_row + i, column=3, value=mutu[i])
-            ws.cell(row=start_row + i, column=4, value=umur_test[i])
-            ws.cell(row=start_row + i, column=5, value=tanggal_cor[i])
-            ws.cell(row=start_row + i, column=6, value=jenis_benda_uji[i])
-            ws.cell(row=start_row + i, column=7, value=ukuran_benda_uji[i])
-            ws.cell(row=start_row + i, column=8, value=volume[i])
-            ws.cell(row=start_row + i, column=9, value=berat[i])
-            ws.cell(row=start_row + i, column=11, value=beban[i])
-            ws.cell(row=start_row + i, column=14, value=tipe_retakan[i])
-
-            ws[f'J{start_row + i}'] = f"=IF(H{start_row + i}=0, 0, I{start_row + i}/H{start_row + i})"
-            ws[f'L{start_row + i}'] = f"=IF(K{start_row + i}=0, 0, K{start_row + i}*10.2/176.71)"
-            ws[f'M{start_row + i}'] = f"=IF(L{start_row + i}=0, 0, L{start_row + i}*10.2/0.83)"
-
-            ws[f'L{start_row + i}'].number_format = '0.00'
-            ws[f'M{start_row + i}'].number_format = '0.00'
-
         wb.save(output_path)
-        return jsonify({"message": "Data berhasil dimasukkan", "file_path": output_path})
+        return f"<script>alert('Data berhasil dimasukkan!'); window.location.href='/'</script>"
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
+        return f"<script>alert('Terjadi kesalahan: {str(e)}'); window.location.href='/'</script>"
 @app.route('/download/<filename>')
 def download_file(filename):
     file_path = os.path.join(OUTPUT_DIR, filename)
