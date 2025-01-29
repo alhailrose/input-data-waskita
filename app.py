@@ -6,6 +6,7 @@ import os
 from datetime import datetime
 from openpyxl.styles import Font, Alignment, PatternFill, Border
 from openpyxl.drawing.image import Image
+from io import BytesIO
 
 app = Flask(__name__)
 
@@ -17,48 +18,21 @@ if not os.path.exists(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR)
 
 def copy_template_to_sheet(template_ws, target_ws):
-    """Salin semua konten, gaya, pengaturan halaman, dimensi, merge cells, dan gambar dari template_ws ke target_ws."""
+    """Salin semua konten, gaya, merge cells, pengaturan halaman, dan gambar dari template_ws ke target_ws."""
+    
+    # Salin isi sel dan format
     for row in template_ws.iter_rows():
         for cell in row:
             new_cell = target_ws.cell(row=cell.row, column=cell.column, value=cell.value)
-            
-            # Salin Font
+
             if cell.font:
-                new_cell.font = Font(
-                    name=cell.font.name,
-                    size=cell.font.size,
-                    bold=cell.font.bold,
-                    italic=cell.font.italic,
-                    underline=cell.font.underline,
-                    strike=cell.font.strike,
-                    color=cell.font.color
-                )
-
-            # Salin Alignment
+                new_cell.font = cell.font
             if cell.alignment:
-                new_cell.alignment = Alignment(
-                    horizontal=cell.alignment.horizontal,
-                    vertical=cell.alignment.vertical,
-                    wrap_text=cell.alignment.wrap_text,
-                    shrink_to_fit=cell.alignment.shrink_to_fit,
-                    text_rotation=cell.alignment.text_rotation
-                )
-
-            # Salin Fill
-            # Salin Fil
-
-            # Salin Border
+                new_cell.alignment = cell.alignment
+            if cell.fill:
+                new_cell.fill = cell.fill
             if cell.border:
-                sides = ['left', 'right', 'top', 'bottom', 'diagonal']
-                border_sides = {side: getattr(cell.border, side) for side in sides}
-                new_cell.border = Border(
-                    left=border_sides['left'],
-                    right=border_sides['right'],
-                    top=border_sides['top'],
-                    bottom=border_sides['bottom'],
-                    diagonal=border_sides['diagonal'],
-                    diagonal_direction=cell.border.diagonal_direction
-                )
+                new_cell.border = cell.border
 
     # Salin merge cells
     for merged_range in template_ws.merged_cells.ranges:
@@ -70,26 +44,19 @@ def copy_template_to_sheet(template_ws, target_ws):
     target_ws.sheet_properties = template_ws.sheet_properties
     target_ws.page_margins = template_ws.page_margins
 
-    # Atur Header dan Footer secara manual (jika diperlukan)
-    if hasattr(template_ws, 'header_footer'):
-        target_ws.header_footer = template_ws.header_footer
-
-    # Salin dimensi kolom dari template ke target
+    # Salin dimensi kolom dan baris
     for col_letter, col_dimension in template_ws.column_dimensions.items():
-        if col_dimension.width:
-            target_ws.column_dimensions[col_letter].width = col_dimension.width
+        target_ws.column_dimensions[col_letter].width = col_dimension.width
 
-    # Salin dimensi baris
     for row_number, row_dimension in template_ws.row_dimensions.items():
-        if row_dimension.height:
-            target_ws.row_dimensions[row_number].height = row_dimension.height
+        target_ws.row_dimensions[row_number].height = row_dimension.height
 
-    # Salin gambar
-    for image in template_ws._images:
-        img = Image(image.ref)
-        img.anchor = image.anchor
-        target_ws.add_image(img)
-
+    # **🔹 Perbaikan utama: Salin gambar dengan BytesIO**
+    for img in template_ws._images:
+        img_stream = BytesIO(img._data())  # Ambil gambar dalam format bytes
+        new_img = Image(img_stream)  # Buat ulang gambar dari bytes
+        new_img.anchor = img.anchor  # Tetapkan posisi gambar yang sama
+        target_ws.add_image(new_img)  # Tambahkan gambar ke t
 @app.route('/')
 def index():
     return render_template('index.html')
